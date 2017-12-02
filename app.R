@@ -8,7 +8,7 @@ library(RColorBrewer)
 library(jsonlite)
 library(curl)
 #library(RJSONIO)
-#changestest
+
 
 about <- '<h1>About RusDraCor</h1>
 <p>Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
@@ -49,6 +49,10 @@ This page was prepared within the framework of the Academic Fund Program
 at the National Research University Higher School of Economics (HSE) in
 2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
 Project "5-100".  '   
+
+about <- readLines(con <- file("changable_about.txt"))
+close(con)
+paste(about, collapse = "")
 
 url <- "https://api.github.com/repositories/86837035/contents/csv/"
 titles <- fromJSON(url, flatten = T)
