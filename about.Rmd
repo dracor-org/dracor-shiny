@@ -1,0 +1,48 @@
+---
+title: "About RusDraCor"
+author: ""
+date: ''
+output: html_document
+---
+   
+     
+Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
+collection of Russian plays from the 1740s to the 1930s. The entire
+corpus is encoded in <a href>https://en.wikipedia.org/wiki/Text_Encoding_Initiative </a>, an XML vocabulary, which makes it easy to
+extract structural information.  
+
+RusDraCor comprises <i>61 plays</i> at present (early June, 2017), but will
+be growing throughout the year. Featured authors so far are Blok,
+Bulgakov, Chechov, Fonvizin, Gogol, Gorkij, Gumilyov, Krylov,
+Majakovskij, Ostrovskij, Plavilschikov, Prutkov ☺, Pushkin, Sumarokov,
+and Turgenev.  
+
+Our main purpose is the social network analysis of these dramatic texts:
+we extract social situations by collecting information on who is talking
+along with others in a given segment of a play (acts, scenes, other
+constellations). Our extraction scripts generate CSV files, which we can
+analyse with a variety of tools. This website gives you the opportunity
+to explore the social structure of individual plays.  
+
+The analytical part for this page was done by Ivan Pozdniakov in R and
+is presented by help of the web application framework Shiny. Ultimately,
+we're interested in structural changes over time, the evolution of
+Russian drama, so to speak, for which we will provide other tools.  
+
+[Website of our research group](https://hum.hse.ru/digital/rusdracor/)  
+
+[GitHub repository](https://github.com/lehkost/RusDraCor)  
+
+##Group members (in alphabetical order):  
+Veronika Faynberg · Frank Fischer · Matvey Kolbasov ·  Svetlana Laschuk
+· Kirill Mazur · Tatyana Orlova · German Palchikov · Irina Pavlova ·
+Ivan Pozdniakov · Evgeniya Shlosman · Danil Skorinkin · Nataliya Tyshkevich  
+
+##Acknowledgements:  
+This page was prepared within the framework of the Academic Fund Program
+at the National Research University Higher School of Economics (HSE) in
+2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
+Project "5-100".  '        
+
+
+
