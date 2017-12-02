@@ -8,6 +8,7 @@ library(RColorBrewer)
 library(jsonlite)
 library(curl)
 #library(RJSONIO)
+#changestest
 
 about <- '<h1>About RusDraCor</h1>
 <p>Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
