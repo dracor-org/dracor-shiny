@@ -31,14 +31,21 @@ csv2d <- function(file){
 d2ig <- function(d){
   x <- graph_from_data_frame(d, directed = F)
   V(x)$betweenness <- betweenness(x, v = V(x), directed = F, weights = NA)
-  V(x)$closeness <- closeness(x, weights = NA)
+  V(x)$closeness <- closeness(x, weights = NA, normalized = T)
   V(x)$strength <- strength(x)
   V(x)$degree <- degree(x)
-  V(x)$average_distance <- 1/closeness(x, weights = NA)
-  V(x)$graph_density <- edge_density(x)
+  V(x)$average_distance <- 1/closeness(x, weights = NA, normalized = T)
   x
 }
 
+d2istats <- function(d){
+  x <- graph_from_data_frame(d, directed = F)
+  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"), 
+                  Value = c(mean_distance(x, directed = FALSE),
+                       edge_density(x), transitivity(x), diameter(x))
+                  )
+  df
+}
 
 ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesize = 0.1, nodesize = 0.1){
   members <- membership(cluster(x))
@@ -95,6 +102,7 @@ ui <- fluidPage(theme = "bootstrap.css",
       tabPanel("Edges", dataTableOutput(outputId = "table")),
       tabPanel("Vertices", dataTableOutput(outputId = "vertices")),
       tabPanel("Weights matrix", tableOutput(output = "matrix")),
+      tabPanel("Play Info", tableOutput(output = "info")),
       tabPanel("About", HTML(about))
       #tabPanel("About", includeHTML(knitr::knit2html("about.Rmd", force_v1 = T, fragment.only = T)))
     )
@@ -132,7 +140,6 @@ server <- function(input, output){
               filter = 'top', rownames = F) %>% 
       formatRound(columns=c('closeness'), digits=4) %>%
       formatRainbow(df()$closeness, "closeness", "BuGn") %>%
-      formatRound(columns=c('graph_density'), digits=2) %>%
       formatRainbow(df()$betweenness, "betweenness", "GnBu") %>%
       formatRound(columns=c('betweenness'), digits=2) %>%
       formatRainbow(df()$strength, "strength", "PuRd") %>%
@@ -148,5 +155,10 @@ server <- function(input, output){
     #plotnet(d3(), charge = -(input$charge+1)^2.2, fontsize = input$fontsize)
     plotnet(d3(), charge = -2^(input$charge+1), fontsize = input$fontsize)
     })
+  
+  output$info <- renderTable({
+    d() %>% d2istats()},  
+    rownames = F, bordered = F, striped = F, digits = 2
+  )
 }
 shinyApp(ui = ui, server = server)
