@@ -4,10 +4,10 @@ library(DT)
 library(data.table)
 library(networkD3)
 library(igraph)
-library(RColorBrewer)
 library(jsonlite)
-#library(curl)
-#library(RJSONIO)
+library(shinythemes)
+library(curl)
+
 
 #about <- readLines(con <- file("changable_about.txt"))
 #close(con)
@@ -66,12 +66,12 @@ dow <- base$networkdataCsvUrl
 names(dow) <- base$titlename
 dow
 }
+#dow <- downloadbase(url)
 
-
+options(shiny.sanitize.errors = F)
 
 csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
-  #d <- d[,c(1,3,2,4)] #changing columns order
   colnames(d) <- tolower(colnames(d))
   d <- d[,.(source, target, weight)]
   d <- d[weight>0,]
@@ -125,31 +125,47 @@ formatRainbow <- function(data, met, name, pall){
 
 ########
 ui <- fluidPage(theme = "bootstrap.css",
-  headerPanel("Russian Drama Corpus (RusDraCor): Showcase"),
+                #shinythemes::themeSelector(),
+  headerPanel("Shiny Dracor"),
   sidebarLayout( 
   sidebarPanel(  
-    splitLayout(
-      cellWidths = c("25%", "75%"),
-      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", German = "ger")),
-#fileInput("file1", "Choose CSV edges file"),
-      uiOutput("base")),
-#selectInput("file2download", "Choose a play to visualize from a list:", downloadbase(paste0(urlshort, input$corpus)))),
+    verticalLayout(
+      splitLayout(cellWidths = c("30%", "70%"),
+          radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", 
+                                                            German = "ger")),
+
+          uiOutput("authors")
+        ),
+      uiOutput("base"),
+      tags$head(tags$style(HTML("
+                              .shiny-split-layout > div {
+                                overflow: visible;
+                              }
+                              ")))),
+
     wellPanel(
-      sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
       selectInput("nodemetric", "Choose a metric for nodes size:", 
                   choices = list("Degree" = 'degree',
                                  "Strength" = 'strength', 
                                  "Betweeness Centrality" = 'betweenness',
                                  "Closeness Centrality" = 'closeness')),
-      sliderInput("nodesize", "Nodes size:", min = 0, max = 4, value = 1, step = 0.05),
       selectInput("cluster", "Choose clusterization algorithm:", 
-              choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy', 
-                             'cluster_label_prop', 'cluster_leading_eigen', 
-                             'cluster_louvain', 'cluster_spinglass', 'cluster_walktrap')),
+                  choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy', 
+                                 'cluster_label_prop', 'cluster_leading_eigen', 
+                                 'cluster_louvain', 'cluster_spinglass', 'cluster_walktrap')),
+      splitLayout(verticalLayout(
+        sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
+        sliderInput("nodesize", "Nodes size:", min = 0, max = 4, value = 1, step = 0.05)),
+        verticalLayout(
       sliderInput("fontsize", "Select font size:", min = 0, max = 50, value = 20),
-      sliderInput("edgesize", "Edges size:", min = 0, max = 4, value = 1, step = 0.05))
+      sliderInput("edgesize", "Edges size:", min = 0, max = 4, value = 1, step = 0.05)))
+    )
   ),
   mainPanel(
+    tags$style(type="text/css",
+               ".shiny-output-error { visibility: hidden; }",
+               ".shiny-output-error:before { visibility: hidden; }"
+    ),
     tabsetPanel(
       tabPanel("Graph", forceNetworkOutput("force")),
       tabPanel("Edges", dataTableOutput(outputId = "table")),
