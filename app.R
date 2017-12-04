@@ -53,13 +53,14 @@ at the National Research University Higher School of Economics (HSE) in
 2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
 Project "5-100".  ' 
 
-url <- "https://api.github.com/repositories/86837035/contents/csv/"
+#url <- "https://api.github.com/repositories/86837035/contents/csv/"
+url <- "https://dracor.org/api/corpus/rus"
 
-titles <- fromJSON(url, flatten = T)
-dow <- titles$download_url
-names(dow) <- titles$name
-dow <- dow[grep('.*\\.csv', dow)]
-names(dow) <- gsub('(.*)\\.csv','\\1', names(dow))
+base <- fromJSON(url, flatten = T)
+base <- base$dramas
+base$titlename <- paste(base$author.name, "-", base$title)
+dow <- base$networkdataCsvUrl
+names(dow) <- base$titlename
 
 csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
