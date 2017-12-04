@@ -55,12 +55,19 @@ Project "5-100".  '
 
 #url <- "https://api.github.com/repositories/86837035/contents/csv/"
 url <- "https://dracor.org/api/corpus/rus"
+urlshort <- "https://dracor.org/api/corpus/"
+#url <- paste0(urlshort, input$corpus)
 
+downloadbase <- function(url){
 base <- fromJSON(url, flatten = T)
 base <- base$dramas
 base$titlename <- paste(base$author.name, "-", base$title)
 dow <- base$networkdataCsvUrl
 names(dow) <- base$titlename
+dow
+}
+
+
 
 csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
@@ -121,8 +128,12 @@ ui <- fluidPage(theme = "bootstrap.css",
   headerPanel("Russian Drama Corpus (RusDraCor): Showcase"),
   sidebarLayout( 
   sidebarPanel(  
-    #fileInput("file1", "Choose CSV edges file"),
-    selectInput("file2download", "Choose a play to visualize from a list:", dow),
+    splitLayout(
+      cellWidths = c("25%", "75%"),
+      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", German = "ger")),
+#fileInput("file1", "Choose CSV edges file"),
+      uiOutput("base")),
+#selectInput("file2download", "Choose a play to visualize from a list:", downloadbase(paste0(urlshort, input$corpus)))),
     wellPanel(
       sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
       selectInput("nodemetric", "Choose a metric for nodes size:", 
@@ -156,6 +167,15 @@ server <- function(input, output){
   #d <-  reactive({inFile <- input$file1
   #  if (is.null(inFile)) return(NULL)
   #  csv2d(inFile$datapath)})
+  output$base <- renderUI({
+    selectInput("file2download", 
+                "Choose a play to visualize from a list:", 
+                downloadbase(
+                  paste0(
+                    urlshort, input$corpus)
+                  )
+                )
+  })
   d <- reactive({inFile <- input$file2download
     if (is.null(inFile)) return(NULL)
     csv2d(inFile)})
