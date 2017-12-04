@@ -6,7 +6,7 @@ library(networkD3)
 library(igraph)
 library(RColorBrewer)
 library(jsonlite)
-#library(curl)
+library(curl)
 #library(RJSONIO)
 
 #about <- readLines(con <- file("changable_about.txt"))
@@ -66,12 +66,12 @@ dow <- base$networkdataCsvUrl
 names(dow) <- base$titlename
 dow
 }
+#dow <- downloadbase(url)
 
-
+options(shiny.sanitize.errors = F)
 
 csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
-  #d <- d[,c(1,3,2,4)] #changing columns order
   colnames(d) <- tolower(colnames(d))
   d <- d[,.(source, target, weight)]
   d <- d[weight>0,]
@@ -129,11 +129,17 @@ ui <- fluidPage(theme = "bootstrap.css",
   sidebarLayout( 
   sidebarPanel(  
     splitLayout(
-      cellWidths = c("25%", "75%"),
-      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", German = "ger")),
+      cellWidths = c("30%", "70%"),
+      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", 
+                                                            German = "ger")),
 #fileInput("file1", "Choose CSV edges file"),
-      uiOutput("base")),
-#selectInput("file2download", "Choose a play to visualize from a list:", downloadbase(paste0(urlshort, input$corpus)))),
+      uiOutput("base"),
+      tags$head(tags$style(HTML("
+                              .shiny-split-layout > div {
+                                overflow: visible;
+                              }
+                              ")))),
+#      selectInput("file2download", "Choose a play to visualize from a list:", downloadbase(url))),
     wellPanel(
       sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
       selectInput("nodemetric", "Choose a metric for nodes size:", 
