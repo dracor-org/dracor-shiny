@@ -135,7 +135,7 @@ formatRainbow <- function(data, met, name, pall){
 
 ########
 ui <- fluidPage(theme = "bootstrap.css",
-  headerPanel("Russian Drama Corpus (RusDraCor): Showcase"),
+  headerPanel("Shiny DraCor"),
   sidebarLayout(
   sidebarPanel(
     splitLayout(
