@@ -7,11 +7,7 @@ library(igraph)
 library(RColorBrewer)
 library(jsonlite)
 library(curl)
-#library(RJSONIO)
 
-#about <- readLines(con <- file("changable_about.txt"))
-#close(con)
-#paste(about, collapse = "")
 
 about <- '<h1>About RusDraCor</h1>
   <p>Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
@@ -53,10 +49,8 @@ at the National Research University Higher School of Economics (HSE) in
 2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
 Project "5-100".  ' 
 
-#url <- "https://api.github.com/repositories/86837035/contents/csv/"
 url <- "https://dracor.org/api/corpus/rus"
 urlshort <- "https://dracor.org/api/corpus/"
-#url <- paste0(urlshort, input$corpus)
 
 downloadbase <- function(url){
 base <- fromJSON(url, flatten = T)
