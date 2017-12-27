@@ -89,7 +89,7 @@ d2ig <- function(d){
 
 d2istats <- function(d){
   x <- graph_from_data_frame(d, directed = F)
-  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"), 
+  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"),
                   Value = c(mean_distance(x, directed = FALSE),
                        edge_density(x), transitivity(x), diameter(x))
                   )
@@ -105,8 +105,8 @@ ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesi
 }
 
 plotnet <- function(x_d3, charge = -1000, size = 400, fontsize = 20){
-  forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge, 
-               Source = 'source', Target = 'target', 
+  forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge,
+               Source = 'source', Target = 'target',
                NodeID = 'name', colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
                Group = "group", Value = "value",
                width = size, height = size,
@@ -120,17 +120,17 @@ ig2csv <- function (x){
 formatRainbow <- function(data, met, name, pall){
   formatStyle(data, columns = name,
             background = styleInterval(
-              cuts = seq(min(met), max(met)*2, length.out = 8), 
+              cuts = seq(min(met), max(met)*2, length.out = 8),
               brewer.pal(9, pall)))}
 
 ########
 ui <- fluidPage(theme = "bootstrap.css",
   headerPanel("Russian Drama Corpus (RusDraCor): Showcase"),
-  sidebarLayout( 
-  sidebarPanel(  
+  sidebarLayout(
+  sidebarPanel(
     splitLayout(
       cellWidths = c("30%", "70%"),
-      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", 
+      radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus",
                                                             German = "ger")),
 #fileInput("file1", "Choose CSV edges file"),
       uiOutput("base"),
@@ -142,15 +142,15 @@ ui <- fluidPage(theme = "bootstrap.css",
 #      selectInput("file2download", "Choose a play to visualize from a list:", downloadbase(url))),
     wellPanel(
       sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
-      selectInput("nodemetric", "Choose a metric for nodes size:", 
+      selectInput("nodemetric", "Choose a metric for nodes size:",
                   choices = list("Degree" = 'degree',
-                                 "Strength" = 'strength', 
+                                 "Strength" = 'strength',
                                  "Betweeness Centrality" = 'betweenness',
                                  "Closeness Centrality" = 'closeness')),
       sliderInput("nodesize", "Nodes size:", min = 0, max = 4, value = 1, step = 0.05),
-      selectInput("cluster", "Choose clusterization algorithm:", 
-              choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy', 
-                             'cluster_label_prop', 'cluster_leading_eigen', 
+      selectInput("cluster", "Choose clusterization algorithm:",
+              choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy',
+                             'cluster_label_prop', 'cluster_leading_eigen',
                              'cluster_louvain', 'cluster_spinglass', 'cluster_walktrap')),
       sliderInput("fontsize", "Select font size:", min = 0, max = 50, value = 20),
       sliderInput("edgesize", "Edges size:", min = 0, max = 4, value = 1, step = 0.05))
@@ -174,8 +174,8 @@ server <- function(input, output){
   #  if (is.null(inFile)) return(NULL)
   #  csv2d(inFile$datapath)})
   output$base <- renderUI({
-    selectInput("file2download", 
-                "Choose a play to visualize from a list:", 
+    selectInput("file2download",
+                "Choose a play to visualize from a list:",
                 downloadbase(
                   paste0(
                     urlshort, input$corpus)
@@ -191,43 +191,43 @@ server <- function(input, output){
     as_data_frame(ig(), "vertices")})
   d3 <- reactive({if (is.null(ig())) return(NULL)
     ig2d3(ig(), cluster = eval(parse(text = input$cluster)),
-              nodemetric = eval(parse(text = input$nodemetric)), 
+              nodemetric = eval(parse(text = input$nodemetric)),
               edgesize = exp(input$edgesize)-1, nodesize = exp(input$nodesize)-1)})
-  
+
   output$table <- DT::renderDataTable({
-    datatable(d(), options = list(digits = 2, lengthMenu = c(10, 15, 20, 50)), 
+    datatable(d(), options = list(digits = 2, lengthMenu = c(10, 15, 20, 50)),
               filter = 'top', rownames = F) %>%
       formatStyle(columns = c('weight'),
                   background = styleInterval(
-                    cuts = round(seq(0, max(d()$weight)*2, length.out = 8)), 
+                    cuts = round(seq(0, max(d()$weight)*2, length.out = 8)),
                     brewer.pal(9, "GnBu")))
     })
   output$vertices <- DT::renderDataTable({
-    datatable(df(), options = list(digits = 2, 
-                                   lengthMenu = c(10, 15, 20, 50)), 
-              filter = 'top', rownames = F) %>% 
+    datatable(df(), options = list(digits = 2,
+                                   lengthMenu = c(10, 15, 20, 50)),
+              filter = 'top', rownames = F) %>%
       formatRound(columns=c('closeness'), digits=4) %>%
       formatRainbow(df()$closeness, "closeness", "BuGn") %>%
       formatRainbow(df()$betweenness, "betweenness", "GnBu") %>%
       formatRound(columns=c('betweenness'), digits=2) %>%
       formatRainbow(df()$strength, "strength", "PuRd") %>%
       formatRainbow(df()$degree, "degree", "Reds") %>%
-      formatRainbow(df()$average_distance, "average_distance", "Purples")  
+      formatRainbow(df()$average_distance, "average_distance", "Purples")
   })
   output$matrix <- renderTable({
     as.matrix(ig()[])
   }, rownames = T, bordered = T, striped = T, spacing = "xs", digits = 0, align = "c")
-  
+
   output$force <- renderForceNetwork({
     if (is.null(d3())) return(NULL)
     #plotnet(d3(), charge = -(input$charge+1)^2.2, fontsize = input$fontsize)
     plotnet(d3(), charge = -2^(input$charge+1), fontsize = input$fontsize)
     })
-  
+
   output$info <- renderTable({
-    d() %>% d2istats()},  
+    d() %>% d2istats()},
     rownames = F, bordered = F, striped = F, digits = 2
   )
-  
+
 }
 shinyApp(ui = ui, server = server)
