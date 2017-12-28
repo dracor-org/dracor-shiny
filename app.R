@@ -15,11 +15,11 @@ and a <b>German Drama Corpus (GerDraCor)</b>, both comprising plays from the
 <a href="https://en.wikipedia.org/wiki/Text_Encoding_Initiative">TEI</a>, an XML
 vocabulary, which makes it easy to extract structural information.</p>
 
-<p>RusDraCor comprises <i>76 plays</i>, GerDraCor hold <i>465 plays</i> at
-present (early December, 2017), but we will be growing both text collections
+<p>RusDraCor comprises <i>80 plays</i>, GerDraCor holds <i>465 plays</i> at
+present (late December, 2017), but we will be growing both text collections
 throughout the next year. Featured authors of RusDraCor so far are Blok,
-Bulgakov, Chechov, Fonvizin, Gogol, Gorkij, Gumilyov, Krylov, Lermontov,
-Majakovskij, Ostrovskij, Plavilschikov, Prutkov 😉, Pushkin, Sumarokov, Leo and
+Bulgakov, Chekhov, Fonvizin, Gogol, Gorky, Gumilyov, Krylov, Lermontov,
+Mayakovsky, Ostrovsky, Plavilshchikov, Prutkov 😉, Pushkin, Sumarokov, Leo and
 Aleksey Tolstoy and Turgenev. German authors are too many to be listed here.</p>
 
 <p>Our main purpose is the social network analysis of these dramatic texts: we
