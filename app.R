@@ -1,4 +1,3 @@
-
 library(shiny)
 library(DT)
 library(data.table)
@@ -7,66 +6,91 @@ library(igraph)
 library(jsonlite)
 library(shinythemes)
 library(curl)
-
+library(RColorBrewer)
 
 #about <- readLines(con <- file("changable_about.txt"))
 #close(con)
 #paste(about, collapse = "")
 
-about <- '<h1>About RusDraCor</h1>
-  <p>Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
-collection of Russian plays from the 1740s to the 1930s. The entire
-corpus is encoded in <a href = "https://en.wikipedia.org/wiki/Text_Encoding_Initiative">TEI</a>, an XML vocabulary, which makes it easy to
-extract structural information.</p>  
 
-<p>RusDraCor comprises <i>67 plays</i> at present (early July, 2017), but will
-be growing throughout the year. Featured authors so far are Blok,
-Bulgakov, Chechov, Fonvizin, Gogol, Gorkij, Gumilyov, Krylov,
-Majakovskij, Ostrovskij, Plavilschikov, Prutkov ☺, Pushkin, Sumarokov, Leo Tolstoy
-and Turgenev.</p>  
+about <- '<h1>About Shiny DraCor</h1>
 
-<p>Our main purpose is the social network analysis of these dramatic texts:
-we extract social situations by collecting information on who is talking
-along with others in a given segment of a play (acts, scenes, other
-constellations). Our extraction scripts generate CSV files, which we can
-analyse with a variety of tools. This website gives you the opportunity
-to explore the social structure of individual plays.</p>
+<p>We maintain two in-house corpora, a <b>Russian Drama Corpus (RusDraCor)</b>
+and a <b>German Drama Corpus (GerDraCor)</b>, both comprising plays from the
+1730s to the 1930s. Both corpora are encoded in
+<a href="https://en.wikipedia.org/wiki/Text_Encoding_Initiative">TEI</a>, an XML
+vocabulary, which makes it easy to extract structural information.</p>
 
-<p>The analytical part for this page was done by Ivan Pozdniakov in R and
-is presented by help of the web application framework Shiny. Ultimately,
-we are interested in structural changes over time, the evolution of
-Russian drama, so to speak, for which we will provide other tools.</p>  
+<p>RusDraCor comprises <i>80 plays</i>, GerDraCor holds <i>465 plays</i> at
+present (late December, 2017), but we will be growing both text collections
+throughout the next year. Featured authors of RusDraCor so far are Blok,
+Bulgakov, Chekhov, Fonvizin, Gogol, Gorky, Gumilyov, Krylov, Lermontov,
+Mayakovsky, Ostrovsky, Plavilshchikov, Prutkov 😉, Pushkin, Sumarokov, Leo and
+Aleksey Tolstoy and Turgenev. German authors are too many to be listed here.</p>
+
+<p>Our main purpose is the social network analysis of these dramatic texts: we
+extract social situations by collecting information on who is talking along with
+others in a given segment of a play (acts, scenes, other constellations). Via an
+API, we offer structural information, which we can analyse with a variety of
+tools. This website gives you the opportunity to explore the social structure of
+individual plays.</p>
+
+<p>The analytical part for this page was done by Ivan Pozdniakov in R and is
+presented by help of the web application framework
+<a href="https://shiny.rstudio.com/">Shiny</a>, hosted on our own server.
+Ultimately, we are interested in structural changes over time, the evolution of
+Russian and German drama, so to speak, for which we provide other tools.</p>
+>>>>>>> bd18079509f6da76b2e484fc1c8b15f1909c6476
 
 <h2>Links</h2>
 
-<p><a href = "https://hum.hse.ru/digital/rusdracor/">Website of our research group</a></p>
-<p><a href = "https://github.com/lehkost/RusDraCor">GitHub repository</a></p>
+<p><a href="https://dracor.org/">Drama Corpora website</a></p>
 
-<h2>Group members (in alphabetical order)</h2>  
-Veronika Faynberg · Frank Fischer · Matvey Kolbasov ·  Svetlana Laschuk
-· Kirill Mazur · Tatyana Orlova · German Palchikov · Irina Pavlova ·
-Ivan Pozdniakov · Evgeniya Shlosman · Danil Skorinkin · Nataliya Tyshkevich  
+<p><a href="https://hum.hse.ru/digital/rusdracor/">Website of our NUG research
+branch</a></p>
+
+<p><a href="https://dlina.github.io/">Website of our DLINA research
+branch</a></p>
+
+<p><a href="https://github.com/dracor-org/">GitHub repository</a></p>
+
+<h2>Group members (in alphabetical order)</h2>
+
+<p>Veronika Faynberg · Frank Fischer · Mathias Göbel · Matvey Kolbasov ·
+Svetlana Laschuk · Kirill Mazur · Carsten Milling · Tatiana Orlova ·
+German Palchikov · Irina Pavlova · Ivan Pozdniakov · Evgeniya Shlosman ·
+Danil Skorinkin · Peer Trilcke</p>
 
 <h2>Acknowledgements</h2>
-This page was prepared within the framework of the Academic Fund Program
-at the National Research University Higher School of Economics (HSE) in
-2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
-Project "5-100".  ' 
 
-#url <- "https://api.github.com/repositories/86837035/contents/csv/"
+<p>This page was prepared within the framework of the Academic Fund Program at
+the National Research University Higher School of Economics (HSE) in 2017·2018
+(grant No 17-05-0054) and by the Russian Academic Excellence Project
+"5-100".</p>
+
+<p>The project also received funding within the framework of the
+<a href="http://www.uni-potsdam.de/foerderung/6-international.html">KoUP 1"</a>
+program of the University of Potsdam.</p>'
+
 url <- "https://dracor.org/api/corpus/rus"
 urlshort <- "https://dracor.org/api/corpus/"
-#url <- paste0(urlshort, input$corpus)
 
-downloadbase <- function(url){
-base <- fromJSON(url, flatten = T)
-base <- base$dramas
-base$titlename <- paste(base$author.name, "-", base$title)
-dow <- base$networkdataCsvUrl
-names(dow) <- base$titlename
-dow
+downloadcorpus <- function(url){
+  fromJSON(url, flatten = T)$dramas 
 }
-#dow <- downloadbase(url)
+
+
+selectauthors <- function(corp){
+  authors <- unique(corp$author.name)
+  names(authors) <- unique(corp$author.name)
+  authors
+}
+
+selectplays <- function(corp, input = input){
+  links <- corp[corp$author.name == input,"networkdataCsvUrl"]
+  names(links) <- corp[corp$author.name == input,"title"]
+  links
+}
 
 options(shiny.sanitize.errors = F)
 
@@ -89,7 +113,7 @@ d2ig <- function(d){
 
 d2istats <- function(d){
   x <- graph_from_data_frame(d, directed = F)
-  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"), 
+  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"),
                   Value = c(mean_distance(x, directed = FALSE),
                        edge_density(x), transitivity(x), diameter(x))
                   )
@@ -105,8 +129,8 @@ ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesi
 }
 
 plotnet <- function(x_d3, charge = -1000, size = 400, fontsize = 20){
-  forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge, 
-               Source = 'source', Target = 'target', 
+  forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge,
+               Source = 'source', Target = 'target',
                NodeID = 'name', colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
                Group = "group", Value = "value",
                width = size, height = size,
@@ -120,7 +144,7 @@ ig2csv <- function (x){
 formatRainbow <- function(data, met, name, pall){
   formatStyle(data, columns = name,
             background = styleInterval(
-              cuts = seq(min(met), max(met)*2, length.out = 8), 
+              cuts = seq(min(met), max(met)*2, length.out = 8),
               brewer.pal(9, pall)))}
 
 ########
@@ -142,11 +166,10 @@ ui <- fluidPage(theme = "bootstrap.css",
                                 overflow: visible;
                               }
                               ")))),
-
     wellPanel(
       selectInput("nodemetric", "Choose a metric for nodes size:", 
                   choices = list("Degree" = 'degree',
-                                 "Strength" = 'strength', 
+                                 "Strength" = 'strength',
                                  "Betweeness Centrality" = 'betweenness',
                                  "Closeness Centrality" = 'closeness')),
       selectInput("cluster", "Choose clusterization algorithm:", 
@@ -180,18 +203,31 @@ ui <- fluidPage(theme = "bootstrap.css",
 )
 server <- function(input, output){
 
-  #d <-  reactive({inFile <- input$file1
-  #  if (is.null(inFile)) return(NULL)
-  #  csv2d(inFile$datapath)})
-  output$base <- renderUI({
-    selectInput("file2download", 
-                "Choose a play to visualize from a list:", 
-                downloadbase(
-                  paste0(
-                    urlshort, input$corpus)
-                  )
-                )
+  corp <- reactive({
+    lang <- input$corpus
+    if(is.null(lang)) return(NULL)
+    downloadcorpus(paste0(urlshort, lang))
   })
+  
+  
+  
+  output$authors <- renderUI({
+    if (is.null( corp() )) return(NULL)
+    selectInput("selectedauthor",
+                "Choose a writer from a list:",
+                selectauthors(corp() )
+    )
+  })
+  
+  output$base <- renderUI({
+    if (is.null( corp() )) return(NULL)
+    selectInput("file2download", 
+                "Choose his/her play to visualize:", 
+                selectplays(corp(), input$selectedauthor)
+    )
+  })
+  
+  
   d <- reactive({inFile <- input$file2download
     if (is.null(inFile)) return(NULL)
     csv2d(inFile)})
@@ -201,43 +237,43 @@ server <- function(input, output){
     as_data_frame(ig(), "vertices")})
   d3 <- reactive({if (is.null(ig())) return(NULL)
     ig2d3(ig(), cluster = eval(parse(text = input$cluster)),
-              nodemetric = eval(parse(text = input$nodemetric)), 
+              nodemetric = eval(parse(text = input$nodemetric)),
               edgesize = exp(input$edgesize)-1, nodesize = exp(input$nodesize)-1)})
-  
+
   output$table <- DT::renderDataTable({
-    datatable(d(), options = list(digits = 2, lengthMenu = c(10, 15, 20, 50)), 
+    datatable(d(), options = list(digits = 2, lengthMenu = c(10, 15, 20, 50)),
               filter = 'top', rownames = F) %>%
       formatStyle(columns = c('weight'),
                   background = styleInterval(
-                    cuts = round(seq(0, max(d()$weight)*2, length.out = 8)), 
+                    cuts = round(seq(0, max(d()$weight)*2, length.out = 8)),
                     brewer.pal(9, "GnBu")))
     })
   output$vertices <- DT::renderDataTable({
-    datatable(df(), options = list(digits = 2, 
-                                   lengthMenu = c(10, 15, 20, 50)), 
-              filter = 'top', rownames = F) %>% 
+    datatable(df(), options = list(digits = 2,
+                                   lengthMenu = c(10, 15, 20, 50)),
+              filter = 'top', rownames = F) %>%
       formatRound(columns=c('closeness'), digits=4) %>%
       formatRainbow(df()$closeness, "closeness", "BuGn") %>%
       formatRainbow(df()$betweenness, "betweenness", "GnBu") %>%
       formatRound(columns=c('betweenness'), digits=2) %>%
       formatRainbow(df()$strength, "strength", "PuRd") %>%
       formatRainbow(df()$degree, "degree", "Reds") %>%
-      formatRainbow(df()$average_distance, "average_distance", "Purples")  
+      formatRainbow(df()$average_distance, "average_distance", "Purples")
   })
   output$matrix <- renderTable({
     as.matrix(ig()[])
   }, rownames = T, bordered = T, striped = T, spacing = "xs", digits = 0, align = "c")
-  
+
   output$force <- renderForceNetwork({
     if (is.null(d3())) return(NULL)
     #plotnet(d3(), charge = -(input$charge+1)^2.2, fontsize = input$fontsize)
     plotnet(d3(), charge = -2^(input$charge+1), fontsize = input$fontsize)
     })
-  
+
   output$info <- renderTable({
-    d() %>% d2istats()},  
+    d() %>% d2istats()},
     rownames = F, bordered = F, striped = F, digits = 2
   )
-  
+
 }
 shinyApp(ui = ui, server = server)
