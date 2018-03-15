@@ -89,7 +89,7 @@ selectauthors <- function(corp){
 selectplays <- function(corp, input = input){
   links <- corp[corp$author.name == input,"networkdataCsvUrl"]
   names(links) <- corp[corp$author.name == input,"title"]
-  links
+  links[order(names(links))]
 }
 
 options(shiny.sanitize.errors = F)
