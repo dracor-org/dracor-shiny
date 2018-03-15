@@ -143,13 +143,15 @@ formatRainbow <- function(data, met, name, pall){
               cuts = seq(min(met), max(met)*2, length.out = 8),
               brewer.pal(9, pall)))}
 
-heat <- function(m, type = "plotly") {
+heat <- function(m, type = "plotly", maxn = 40) {
   switch(type, 
         ggplot =  heatmaply(m, 
                   grid_gap = 0, 
                   colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
                   Colv = F, 
                   Rowv = F,
+                  margins = c(100,100,0,0),
+                  showticklabels = length(colnames(m))<maxn,
                   label_names = c("Column", "Row", "Weight"),
                   plot_method = "ggplot", colorbar_len = 1, node_type = "scatter",
                   point_size_mat = m),
@@ -158,8 +160,8 @@ heat <- function(m, type = "plotly") {
                                     grid_gap = 0, 
                                     Colv = F, 
                                     Rowv = F,
-                                    width = 500,
-                                    height = 400,
+                                    margins = c(100,100,0,0),
+                                    showticklabels = length(colnames(m))<maxn,
                                     label_names = c("Column", "Row", "Weight"),
                                     plot_method = "plotly", colorbar_len = 0.7), 
                           nticks = max(m)+1)
