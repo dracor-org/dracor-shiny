@@ -7,6 +7,7 @@ library(jsonlite)
 library(shinythemes)
 library(curl)
 library(RColorBrewer)
+library(heatmaply)
 
 about <- '<h1>About Shiny DraCor</h1>
 
@@ -107,10 +108,11 @@ d2ig <- function(d){
 
 d2istats <- function(d){
   x <- graph_from_data_frame(d, directed = F)
-  df <- data.frame(Variable = c("Mean Distance", "Graph Density", "Clustering", "Diameter"),
-                  Value = c(mean_distance(x, directed = FALSE),
-                       edge_density(x), transitivity(x), diameter(x))
-                  )
+  df <- data.frame(`Mean Distance` = mean_distance(x, directed = FALSE),
+                  `Graph Density` = edge_density(x),
+                  Clustering =  transitivity(x),
+                  Diameter = diameter(x),
+                  check.names = FALSE)
   df
 }
 
@@ -141,9 +143,31 @@ formatRainbow <- function(data, met, name, pall){
               cuts = seq(min(met), max(met)*2, length.out = 8),
               brewer.pal(9, pall)))}
 
+heat <- function(m, type = "plotly") {
+  switch(type, 
+        ggplot =  heatmaply(m, 
+                  grid_gap = 0, 
+                  colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
+                  Colv = F, 
+                  Rowv = F,
+                  label_names = c("Column", "Row", "Weight"),
+                  plot_method = "ggplot", colorbar_len = 1, node_type = "scatter",
+                  point_size_mat = m),
+        plotly = colorbar(heatmaply(m, 
+                                    colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
+                                    grid_gap = 0, 
+                                    Colv = F, 
+                                    Rowv = F,
+                                    width = 500,
+                                    height = 400,
+                                    label_names = c("Column", "Row", "Weight"),
+                                    plot_method = "plotly", colorbar_len = 0.7), 
+                          nticks = max(m)+1)
+  )}
+
 ########
-ui <- fluidPage(theme = "bootstrap.css",
-                #shinythemes::themeSelector(),
+ui <- fluidPage(theme = shinytheme("readable"),
+                shinythemes::themeSelector(),
   headerPanel("Shiny Dracor"),
   sidebarLayout(
   sidebarPanel(
@@ -187,8 +211,11 @@ ui <- fluidPage(theme = "bootstrap.css",
       tabPanel("Graph", forceNetworkOutput("force")),
       tabPanel("Edges", dataTableOutput(outputId = "table")),
       tabPanel("Vertices", dataTableOutput(outputId = "vertices")),
-      tabPanel("Weights matrix", tableOutput(output = "matrix")),
-      tabPanel("Play Info", tableOutput(output = "info")),
+#      tabPanel("Weights matrix", tableOutput(output = "matrix")),
+      tabPanel("Play Info", verticalLayout(plotlyOutput("heatmap",
+                                                        width = 550,
+                                                        height = 400), 
+                                           tableOutput(output = "info"))),
       tabPanel("About", HTML(about))
       #tabPanel("About", includeHTML(knitr::knit2html("about.Rmd", force_v1 = T, fragment.only = T)))
     )
@@ -254,10 +281,13 @@ server <- function(input, output){
       formatRainbow(df()$degree, "degree", "Reds") %>%
       formatRainbow(df()$average_distance, "average_distance", "Purples")
   })
-  output$matrix <- renderTable({
-    as.matrix(ig()[])
-  }, rownames = T, bordered = T, striped = T, spacing = "xs", digits = 0, align = "c")
+#  output$matrix <- renderTable({
+#    as.matrix(ig()[])
+#  }, rownames = T, bordered = T, striped = T, spacing = "xs", digits = 0, align = "c")
 
+  output$heatmap <- renderPlotly(
+    heat(as.matrix(ig()[]))
+  )
   output$force <- renderForceNetwork({
     if (is.null(d3())) return(NULL)
     #plotnet(d3(), charge = -(input$charge+1)^2.2, fontsize = input$fontsize)
