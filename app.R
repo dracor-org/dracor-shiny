@@ -8,11 +8,6 @@ library(shinythemes)
 library(curl)
 library(RColorBrewer)
 
-#about <- readLines(con <- file("changable_about.txt"))
-#close(con)
-#paste(about, collapse = "")
-
-
 about <- '<h1>About Shiny DraCor</h1>
 
 <p>We maintain two in-house corpora, a <b>Russian Drama Corpus (RusDraCor)</b>
@@ -40,7 +35,6 @@ presented by help of the web application framework
 <a href="https://shiny.rstudio.com/">Shiny</a>, hosted on our own server.
 Ultimately, we are interested in structural changes over time, the evolution of
 Russian and German drama, so to speak, for which we provide other tools.</p>
->>>>>>> bd18079509f6da76b2e484fc1c8b15f1909c6476
 
 <h2>Links</h2>
 
@@ -76,7 +70,7 @@ url <- "https://dracor.org/api/corpus/rus"
 urlshort <- "https://dracor.org/api/corpus/"
 
 downloadcorpus <- function(url){
-  fromJSON(url, flatten = T)$dramas 
+  fromJSON(url, flatten = T)$dramas
 }
 
 
@@ -151,11 +145,11 @@ formatRainbow <- function(data, met, name, pall){
 ui <- fluidPage(theme = "bootstrap.css",
                 #shinythemes::themeSelector(),
   headerPanel("Shiny Dracor"),
-  sidebarLayout( 
-  sidebarPanel(  
+  sidebarLayout(
+  sidebarPanel(
     verticalLayout(
       splitLayout(cellWidths = c("30%", "70%"),
-          radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus", 
+          radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus",
                                                             German = "ger")),
 
           uiOutput("authors")
@@ -167,14 +161,14 @@ ui <- fluidPage(theme = "bootstrap.css",
                               }
                               ")))),
     wellPanel(
-      selectInput("nodemetric", "Choose a metric for nodes size:", 
+      selectInput("nodemetric", "Choose a metric for nodes size:",
                   choices = list("Degree" = 'degree',
                                  "Strength" = 'strength',
                                  "Betweeness Centrality" = 'betweenness',
                                  "Closeness Centrality" = 'closeness')),
-      selectInput("cluster", "Choose clusterization algorithm:", 
-                  choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy', 
-                                 'cluster_label_prop', 'cluster_leading_eigen', 
+      selectInput("cluster", "Choose clusterization algorithm:",
+                  choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy',
+                                 'cluster_label_prop', 'cluster_leading_eigen',
                                  'cluster_louvain', 'cluster_spinglass', 'cluster_walktrap')),
       splitLayout(verticalLayout(
         sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
@@ -208,9 +202,9 @@ server <- function(input, output){
     if(is.null(lang)) return(NULL)
     downloadcorpus(paste0(urlshort, lang))
   })
-  
-  
-  
+
+
+
   output$authors <- renderUI({
     if (is.null( corp() )) return(NULL)
     selectInput("selectedauthor",
@@ -218,16 +212,16 @@ server <- function(input, output){
                 selectauthors(corp() )
     )
   })
-  
+
   output$base <- renderUI({
     if (is.null( corp() )) return(NULL)
-    selectInput("file2download", 
-                "Choose his/her play to visualize:", 
+    selectInput("file2download",
+                "Choose his/her play to visualize:",
                 selectplays(corp(), input$selectedauthor)
     )
   })
-  
-  
+
+
   d <- reactive({inFile <- input$file2download
     if (is.null(inFile)) return(NULL)
     csv2d(inFile)})
