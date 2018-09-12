@@ -181,13 +181,8 @@ ui <- fluidPage(theme = shinytheme("united"),
   sidebarLayout(
   sidebarPanel(
     verticalLayout(
-      splitLayout(cellWidths = c("30%", "70%"),
-          #radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus",
-          #                                                  German = "ger")),
-          uiOutput("corpora"),
-
-          uiOutput("authors")
-        ),
+      uiOutput("corpora"),
+      uiOutput("authors"),
       uiOutput("base"),
       tags$head(tags$style(HTML("
                               .shiny-split-layout > div {
