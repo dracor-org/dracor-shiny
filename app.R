@@ -69,11 +69,18 @@ program of the University of Potsdam.</p>'
 
 url <- "https://dracor.org/api/corpus/rus"
 urlshort <- "https://dracor.org/api/corpus/"
+urlmetrics <- 'https://dracor.org/api/metrics'
 
 downloadcorpus <- function(url){
   fromJSON(url, flatten = T)$dramas
 }
 
+selectcorpus <- function(urlmetrics){
+  metrics <- fromJSON(urlmetrics)$metrics
+  cornames <- metrics$corpus$name
+  names(cornames) <- metrics$corpus$title
+  as.list(cornames)
+}
 
 selectauthors <- function(corp){
   authors <- unique(corp$author.name)
@@ -175,8 +182,9 @@ ui <- fluidPage(theme = shinytheme("united"),
   sidebarPanel(
     verticalLayout(
       splitLayout(cellWidths = c("30%", "70%"),
-          radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus",
-                                                            German = "ger")),
+          #radioButtons("corpus", "Drama Corpus", choices = list(Russian = "rus",
+          #                                                  German = "ger")),
+          uiOutput("corpora"),
 
           uiOutput("authors")
         ),
@@ -232,7 +240,12 @@ server <- function(input, output){
     downloadcorpus(paste0(urlshort, lang))
   })
 
-
+  output$corpora <- renderUI({
+    selectInput("corpus",
+                "Choose a corpus",
+                selectcorpus("https://dracor.org/api/metrics")
+    )
+})
 
   output$authors <- renderUI({
     if (is.null( corp() )) return(NULL)
