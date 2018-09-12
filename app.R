@@ -238,7 +238,7 @@ server <- function(input, output){
   output$corpora <- renderUI({
     selectInput("corpus",
                 "Choose a corpus",
-                selectcorpus("https://dracor.org/api/metrics")
+                selectcorpus(urlmetrics)
     )
 })
 
