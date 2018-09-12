@@ -168,8 +168,8 @@ heat <- function(m, type = "plotly", maxn = 40) {
   )}
 
 ########
-ui <- fluidPage(theme = shinytheme("readable"),
-                shinythemes::themeSelector(),
+ui <- fluidPage(theme = shinytheme("united"),
+                #shinythemes::themeSelector(),
   headerPanel("Shiny Dracor"),
   sidebarLayout(
   sidebarPanel(
