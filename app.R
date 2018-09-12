@@ -123,9 +123,17 @@ d2istats <- function(d){
   df
 }
 
+add_labels <- function(d3, link){
+  shortlink <- gsub("/networkdata/csv", "",link, fixed = T)
+  bib <- fromJSON(shortlink)$cast
+  d3$nodes$label <- bib[bib$id == d3$nodes$name, "name"]
+  d3
+}
+
 ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesize = 0.1, nodesize = 0.1){
   members <- membership(cluster(x))
   x_d3 <- igraph_to_networkD3(x, group = members)
+  x_d3 <- add_labels(x_d3, isolate(values$url))
   x_d3$links$value = E(x)$weight*edgesize
   x_d3$nodes$nodesize = nodemetric(x)*nodesize
   x_d3
@@ -134,7 +142,7 @@ ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesi
 plotnet <- function(x_d3, charge = -1000, size = 400, fontsize = 20){
   forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge,
                Source = 'source', Target = 'target',
-               NodeID = 'name', colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               NodeID = 'label', colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
                Group = "group", Value = "value",
                width = size, height = size,
                Nodesize = "nodesize", opacity = 0.8, opacityNoHover = 0.85,
@@ -261,6 +269,7 @@ server <- function(input, output){
 
   d <- reactive({inFile <- input$file2download
     if (is.null(inFile)) return(NULL)
+    values <<- reactiveValues(url = inFile) 
     csv2d(inFile)})
   ig <- reactive({if (is.null(d())) return(NULL)
     d2ig(d())})
