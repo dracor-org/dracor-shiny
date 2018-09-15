@@ -126,7 +126,9 @@ d2istats <- function(d){
 add_labels <- function(d3, link){
   shortlink <- gsub("/networkdata/csv", "",link, fixed = T)
   bib <- fromJSON(shortlink)$cast
-  d3$nodes$label <- bib[bib$id == d3$nodes$name, "name"]
+  d3$nodes$label <- as.character(d3$nodes$name)
+  index <- match(bib$id, d3$nodes$label, nomatch = 0)
+  d3$nodes$label[index] <- bib[bib$id %in% d3$nodes$label, "name"]
   d3
 }
 
