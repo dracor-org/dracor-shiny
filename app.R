@@ -67,8 +67,8 @@ the National Research University Higher School of Economics (HSE) in 2017·2018
 <a href="http://www.uni-potsdam.de/foerderung/6-international.html">KoUP 1"</a>
 program of the University of Potsdam.</p>'
 
-url <- "https://dracor.org/api/corpus/rus"
-urlshort <- "https://dracor.org/api/corpus/"
+url <- "https://dracor.org/api/corpora/rus"
+urlshort <- "https://dracor.org/api/corpora/"
 urlmetrics <- 'https://dracor.org/api/metrics'
 
 downloadcorpus <- function(url){
