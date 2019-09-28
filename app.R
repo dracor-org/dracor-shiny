@@ -69,16 +69,16 @@ program of the University of Potsdam.</p>'
 
 url <- "https://dracor.org/api/corpora/rus"
 urlshort <- "https://dracor.org/api/corpora/"
-urlmetrics <- 'https://dracor.org/api/metrics'
+urlcorpora <- 'https://dracor.org/api/corpora'
 
 downloadcorpus <- function(url){
   fromJSON(url, flatten = T)$dramas
 }
 
-selectcorpus <- function(urlmetrics){
-  metrics <- fromJSON(urlmetrics)$metrics
-  cornames <- metrics$corpus$name
-  names(cornames) <- metrics$corpus$title
+selectcorpus <- function(urlcorpora){
+  corpora <- fromJSON(urlcorpora)
+  cornames <- corpora$name
+  names(cornames) <- corpora$title
   as.list(cornames)
 }
 
@@ -161,26 +161,26 @@ formatRainbow <- function(data, met, name, pall){
               brewer.pal(9, pall)))}
 
 heat <- function(m, type = "plotly", maxn = 40) {
-  switch(type, 
-        ggplot =  heatmaply(m, 
-                  grid_gap = 0, 
+  switch(type,
+        ggplot =  heatmaply(m,
+                  grid_gap = 0,
                   colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
-                  Colv = F, 
+                  Colv = F,
                   Rowv = F,
                   margins = c(100,100,0,0),
                   showticklabels = length(colnames(m))<maxn,
                   label_names = c("Column", "Row", "Weight"),
                   plot_method = "ggplot", colorbar_len = 1, node_type = "scatter",
                   point_size_mat = m),
-        plotly = colorbar(heatmaply(m, 
+        plotly = colorbar(heatmaply(m,
                                     colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
-                                    grid_gap = 0, 
-                                    Colv = F, 
+                                    grid_gap = 0,
+                                    Colv = F,
                                     Rowv = F,
                                     margins = c(100,100,0,0),
                                     showticklabels = length(colnames(m))<maxn,
                                     label_names = c("Column", "Row", "Weight"),
-                                    plot_method = "plotly", colorbar_len = 0.7), 
+                                    plot_method = "plotly", colorbar_len = 0.7),
                           nticks = max(m)+1)
   )}
 
@@ -229,7 +229,7 @@ ui <- fluidPage(theme = shinytheme("united"),
 #      tabPanel("Weights matrix", tableOutput(output = "matrix")),
       tabPanel("Play Info", verticalLayout(plotlyOutput("heatmap",
                                                         width = 550,
-                                                        height = 400), 
+                                                        height = 400),
                                            tableOutput(output = "info"))),
       tabPanel("About", HTML(about))
       #tabPanel("About", includeHTML(knitr::knit2html("about.Rmd", force_v1 = T, fragment.only = T)))
@@ -248,7 +248,7 @@ server <- function(input, output){
   output$corpora <- renderUI({
     selectInput("corpus",
                 "Choose a corpus",
-                selectcorpus(urlmetrics)
+                selectcorpus(urlcorpora)
     )
 })
 
@@ -271,7 +271,7 @@ server <- function(input, output){
 
   d <- reactive({inFile <- input$file2download
     if (is.null(inFile)) return(NULL)
-    values <<- reactiveValues(url = inFile) 
+    values <<- reactiveValues(url = inFile)
     csv2d(inFile)})
   ig <- reactive({if (is.null(d())) return(NULL)
     d2ig(d())})
