@@ -4,3 +4,5 @@
 .Ruserdata
 check.csv
 .Rproj
+.DS_Store
+Dracor-shiny.Rproj
