@@ -1,13 +1,14 @@
-<h1>About RusDraCor</h1>
+<h1>About DraCor</h1>
 <p>Our project <b>Russian Drama Corpus (RusDraCor)</b> aims at presenting a
-collection of Russian plays from the 1740s to the 1930s. The entire
-corpus is encoded in <a href = "https://en.wikipedia.org/wiki/Text_Encoding_Initiative">TEI</a>, an XML vocabulary, which makes it easy to
-extract structural information.</p>  
+collection of Russian plays from the 1740s to the 1930s. The entire corpus is 
+encoded in
+<a href = "https://en.wikipedia.org/wiki/Text_Encoding_Initiative">TEI</a>, an 
+XML vocabulary, which makes it easy to extract structural information.</p>  
 
 <p>RusDraCor comprises <i>67 plays</i> at present (early July, 2017), but will
 be growing throughout the year. Featured authors so far are Blok,
 Bulgakov, Chechov, Fonvizin, Gogol, Gorkij, Gumilyov, Krylov,
-Majakovskij, Ostrovskij, Plavilschikov, Prutkov O, Pushkin, Sumarokov, Leo Tolstoy
+Majakovskij, Ostrovskij, Plavilschikov, Prutkov, Pushkin, Sumarokov, Leo Tolstoy
 and Turgenev.</p>  
 
 <p>Our main purpose is the social network analysis of these dramatic texts:
@@ -28,12 +29,12 @@ Russian drama, so to speak, for which we will provide other tools.</p>
 <p><a href = "https://github.com/lehkost/RusDraCor">GitHub repository</a></p>
  
 <h2>Group members (in alphabetical order)</h2>  
-Veronika Faynberg · Frank Fischer · Matvey Kolbasov ·  Svetlana Laschuk
-· Kirill Mazur · Tatyana Orlova · German Palchikov · Irina Pavlova ·
-Ivan Pozdniakov · Evgeniya Shlosman · Danil Skorinkin · Nataliya Tyshkevich  
+Veronika Faynberg Â· Frank Fischer Â· Matvey Kolbasov Â·  Svetlana Laschuk
+Â· Kirill Mazur Â· Tatyana Orlova Â· German Palchikov Â· Irina Pavlova Â·
+Ivan Pozdniakov Â· Evgeniya Shlosman Â· Danil Skorinkin Â· Nataliya Tyshkevich  
 
 <h2>Acknowledgements</h2>
 This page was prepared within the framework of the Academic Fund Program
 at the National Research University Higher School of Economics (HSE) in
-2017–2018 (grant No 17-05-0054) and by the Russian Academic Excellence
+2017â€“2018 (grant No 17-05-0054) and by the Russian Academic Excellence
 Project "5-100".  
