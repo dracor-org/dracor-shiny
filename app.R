@@ -72,7 +72,7 @@ urlshort <- "https://dracor.org/api/corpora/"
 urlcorpora <- 'https://dracor.org/api/corpora'
 
 downloadcorpus <- function(url){
-  fromJSON(url, flatten = T)$dramas
+  fromJSON(url, flatten = TRUE)$dramas
 }
 
 selectcorpus <- function(urlcorpora){
@@ -89,12 +89,12 @@ selectauthors <- function(corp){
 }
 
 selectplays <- function(corp, input = input){
-  links <- corp[corp$author.name == input,"networkdataCsvUrl"]
-  names(links) <- corp[corp$author.name == input,"title"]
+  links <- corp[corp$author.name == input, "networkdataCsvUrl"]
+  names(links) <- corp[corp$author.name == input, "title"]
   links[order(names(links))]
 }
 
-options(shiny.sanitize.errors = F)
+options(shiny.sanitize.errors = FALSE)
 
 csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
@@ -104,7 +104,7 @@ csv2d <- function(file){
   d}
 
 d2ig <- function(d){
-  x <- graph_from_data_frame(d, directed = F)
+  x <- graph_from_data_frame(d, directed = FALSE)
   V(x)$betweenness <- betweenness(x, v = V(x), directed = F, weights = NA)
   V(x)$closeness <- closeness(x, weights = NA, normalized = T)
   V(x)$strength <- strength(x)
@@ -114,7 +114,7 @@ d2ig <- function(d){
 }
 
 d2istats <- function(d){
-  x <- graph_from_data_frame(d, directed = F)
+  x <- graph_from_data_frame(d, directed = FALSE)
   df <- data.frame(`Mean Distance` = mean_distance(x, directed = FALSE),
                   `Graph Density` = edge_density(x),
                   Clustering =  transitivity(x),
@@ -124,7 +124,7 @@ d2istats <- function(d){
 }
 
 add_labels <- function(d3, link){
-  shortlink <- gsub("/networkdata/csv", "",link, fixed = T)
+  shortlink <- gsub("/networkdata/csv", "",link, fixed = TRUE)
   bib <- fromJSON(shortlink)$cast
   d3$nodes$label <- as.character(d3$nodes$name)
   index <- match(bib$id, d3$nodes$label, nomatch = 0)
@@ -132,19 +132,23 @@ add_labels <- function(d3, link){
   d3
 }
 
-ig2d3 <- function(x, cluster = cluster_label_prop, nodemetric = strength, edgesize = 0.1, nodesize = 0.1){
+ig2d3 <- function(x,
+                  cluster = cluster_label_prop,
+                  nodemetric = strength,
+                  edgesize = 0.1, 
+                  nodesize = 0.1){
   members <- membership(cluster(x))
   x_d3 <- igraph_to_networkD3(x, group = members)
   x_d3 <- add_labels(x_d3, isolate(values$url))
-  x_d3$links$value = E(x)$weight*edgesize
-  x_d3$nodes$nodesize = nodemetric(x)*nodesize
+  x_d3$links$value = E(x)$weight * edgesize
+  x_d3$nodes$nodesize = nodemetric(x) * nodesize
   x_d3
 }
 
 plotnet <- function(x_d3, charge = -1000, size = 400, fontsize = 20){
   forceNetwork(Links = x_d3$links, Nodes = x_d3$nodes, charge = charge,
-               Source = 'source', Target = 'target',
-               NodeID = 'label', colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+               Source = 'source', Target = 'target', NodeID = 'label', 
+               colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
                Group = "group", Value = "value",
                width = size, height = size,
                Nodesize = "nodesize", opacity = 0.8, opacityNoHover = 0.85,
@@ -157,31 +161,35 @@ ig2csv <- function (x){
 formatRainbow <- function(data, met, name, pall){
   formatStyle(data, columns = name,
             background = styleInterval(
-              cuts = seq(min(met), max(met)*2, length.out = 8),
+              cuts = seq(min(met), max(met) * 2, length.out = 8),
               brewer.pal(9, pall)))}
 
 heat <- function(m, type = "plotly", maxn = 40) {
   switch(type,
         ggplot =  heatmaply(m,
-                  grid_gap = 0,
-                  colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
-                  Colv = F,
-                  Rowv = F,
-                  margins = c(100,100,0,0),
-                  showticklabels = length(colnames(m))<maxn,
-                  label_names = c("Column", "Row", "Weight"),
-                  plot_method = "ggplot", colorbar_len = 1, node_type = "scatter",
-                  point_size_mat = m),
+                            grid_gap = 0,
+                            colors = colorRampPalette(brewer.pal(9, "YlGnBu")),
+                            Colv = FALSE,
+                            Rowv = FALSE,
+                            margins = c(100, 100, 0, 0),
+                            showticklabels = length(colnames(m)) < maxn,
+                            label_names = c("Column", "Row", "Weight"),
+                            plot_method = "ggplot",
+                            colorbar_len = 1,
+                            node_type = "scatter",
+                            point_size_mat = m),
         plotly = colorbar(heatmaply(m,
-                                    colors = colorRampPalette(brewer.pal(9,"YlGnBu")),
+                                    colors = colorRampPalette(
+                                      brewer.pal(9, "YlGnBu")),
                                     grid_gap = 0,
-                                    Colv = F,
-                                    Rowv = F,
-                                    margins = c(100,100,0,0),
-                                    showticklabels = length(colnames(m))<maxn,
+                                    Colv = FALSE,
+                                    Rowv = FALSE,
+                                    margins = c(100, 100, 0, 0),
+                                    showticklabels = length(colnames(m)) < maxn,
                                     label_names = c("Column", "Row", "Weight"),
-                                    plot_method = "plotly", colorbar_len = 0.7),
-                          nticks = max(m)+1)
+                                    plot_method = "plotly",
+                                    colorbar_len = 0.7),
+                          nticks = max(m) + 1)
   )}
 
 ########
@@ -206,15 +214,24 @@ ui <- fluidPage(theme = shinytheme("united"),
                                  "Betweeness Centrality" = 'betweenness',
                                  "Closeness Centrality" = 'closeness')),
       selectInput("cluster", "Choose clusterization algorithm:",
-                  choices = list('cluster_optimal','cluster_edge_betweenness', 'cluster_fast_greedy',
-                                 'cluster_label_prop', 'cluster_leading_eigen',
-                                 'cluster_louvain', 'cluster_spinglass', 'cluster_walktrap')),
+                  choices = list('cluster_optimal',
+                                 'cluster_edge_betweenness',
+                                 'cluster_fast_greedy',
+                                 'cluster_label_prop',
+                                 'cluster_leading_eigen',
+                                 'cluster_louvain',
+                                 'cluster_spinglass',
+                                 'cluster_walktrap')),
       splitLayout(verticalLayout(
-        sliderInput("charge", "Select charge:", min = 0, max = 12, value = 4, step = 0.05),
-        sliderInput("nodesize", "Nodes size:", min = 0, max = 4, value = 1, step = 0.05)),
+        sliderInput("charge", "Select charge:",
+                    min = 0, max = 12, value = 4, step = 0.05),
+        sliderInput("nodesize", "Nodes size:",
+                    min = 0, max = 4, value = 1, step = 0.05)),
         verticalLayout(
-      sliderInput("fontsize", "Select font size:", min = 0, max = 50, value = 20),
-      sliderInput("edgesize", "Edges size:", min = 0, max = 4, value = 1, step = 0.05)))
+      sliderInput("fontsize", "Select font size:",
+                  min = 0, max = 50, value = 20),
+      sliderInput("edgesize", "Edges size:",
+                  min = 0, max = 4, value = 1, step = 0.05)))
     )
   ),
   mainPanel(
@@ -253,15 +270,15 @@ server <- function(input, output){
 })
 
   output$authors <- renderUI({
-    if (is.null( corp() )) return(NULL)
+    if (is.null(corp())) return(NULL)
     selectInput("selectedauthor",
                 "Choose a writer from a list:",
-                selectauthors(corp() )
+                selectauthors(corp())
     )
   })
 
   output$base <- renderUI({
-    if (is.null( corp() )) return(NULL)
+    if (is.null(corp())) return(NULL)
     selectInput("file2download",
                 "Choose his/her play to visualize:",
                 selectplays(corp(), input$selectedauthor)
@@ -273,28 +290,42 @@ server <- function(input, output){
     if (is.null(inFile)) return(NULL)
     values <<- reactiveValues(url = inFile)
     csv2d(inFile)})
-  ig <- reactive({if (is.null(d())) return(NULL)
-    d2ig(d())})
-  df <- reactive({if (is.null(ig())) return(NULL)
-    as_data_frame(ig(), "vertices")})
-  d3 <- reactive({if (is.null(ig())) return(NULL)
-    ig2d3(ig(), cluster = eval(parse(text = input$cluster)),
-              nodemetric = eval(parse(text = input$nodemetric)),
-              edgesize = exp(input$edgesize)-1, nodesize = exp(input$nodesize)-1)})
+  ig <- reactive({
+    if (is.null(d())) return(NULL)
+    d2ig(d())
+    })
+  df <- reactive({
+    if (is.null(ig())) return(NULL)
+    as_data_frame(ig(), "vertices")
+    })
+  d3 <- reactive({
+    if (is.null(ig())) return(NULL)
+    ig2d3(ig(),
+          cluster = eval(parse(text = input$cluster)),
+          nodemetric = eval(parse(text = input$nodemetric)),
+          edgesize = exp(input$edgesize) - 1,
+          nodesize = exp(input$nodesize) - 1)
+    })
 
   output$table <- DT::renderDataTable({
-    datatable(d(), options = list(digits = 2, lengthMenu = c(10, 15, 20, 50)),
-              filter = 'top', rownames = F) %>%
-      formatStyle(columns = c('weight'),
-                  background = styleInterval(
-                    cuts = round(seq(0, max(d()$weight)*2, length.out = 8)),
-                    brewer.pal(9, "GnBu")))
+    datatable(d(),
+              options = list(digits = 2,
+                             lengthMenu = c(10, 15, 20, 50)),
+                             filter = 'top',
+                             rownames = FALSE) %>%
+    formatStyle(columns = c('weight'),
+                background = styleInterval(cuts = round(seq(0, 
+                                                            max(d()$weight) * 2,
+                                                            length.out = 8)),
+                                           brewer.pal(9, "GnBu")))
     })
   output$vertices <- DT::renderDataTable({
-    datatable(df(), options = list(digits = 2,
-                                   lengthMenu = c(10, 15, 20, 50)),
-              filter = 'top', rownames = F) %>%
-      formatRound(columns=c('closeness'), digits=4) %>%
+      datatable(df(),
+                options = list(digits = 2,
+                               lengthMenu = c(10, 15, 20, 50)),
+                filter = 'top',
+                rownames = FALSE) %>%
+      formatRound(columns = c('closeness'), digits=4) %>%
       formatRainbow(df()$closeness, "closeness", "BuGn") %>%
       formatRainbow(df()$betweenness, "betweenness", "GnBu") %>%
       formatRound(columns=c('betweenness'), digits=2) %>%
@@ -312,12 +343,16 @@ server <- function(input, output){
   output$force <- renderForceNetwork({
     if (is.null(d3())) return(NULL)
     #plotnet(d3(), charge = -(input$charge+1)^2.2, fontsize = input$fontsize)
-    plotnet(d3(), charge = -2^(input$charge+1), fontsize = input$fontsize)
+    plotnet(d3(), charge = -2 ^ (input$charge + 1), fontsize = input$fontsize)
     })
 
   output$info <- renderTable({
-    d() %>% d2istats()},
-    rownames = F, bordered = F, striped = F, digits = 2
+                              d() %>% d2istats()
+    },
+                             rownames = FALSE,
+                             bordered = FALSE,
+                             striped = FALSE,
+                             digits = 2
   )
 
 }
