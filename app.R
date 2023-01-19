@@ -44,16 +44,16 @@ csv2d <- function(file){
   d <- fread(file, encoding = "UTF-8")
   colnames(d) <- tolower(colnames(d))
   d <- d[,.(source, target, weight)]
-  d <- d[weight>0,]
+  d <- d[weight > 0,]
   d}
 
 d2ig <- function(d){
   x <- graph_from_data_frame(d, directed = FALSE)
-  V(x)$betweenness <- betweenness(x, v = V(x), directed = F, weights = NA)
-  V(x)$closeness <- closeness(x, weights = NA, normalized = T)
+  V(x)$betweenness <- betweenness(x, v = V(x), directed = FALSE, weights = NA)
+  V(x)$closeness <- closeness(x, weights = NA, normalized = TRUE)
   V(x)$strength <- strength(x)
   V(x)$degree <- degree(x)
-  V(x)$average_distance <- 1/closeness(x, weights = NA, normalized = T)
+  V(x)$average_distance <- 1 / closeness(x, weights = NA, normalized = TRUE)
   x
 }
 
