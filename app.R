@@ -192,7 +192,7 @@ ui <- fluidPage(theme = shinytheme("united"),
                                                         width = 550,
                                                         height = 400),
                                            tableOutput(output = "info"))),
-      tabPanel("About", HTML(about))
+      tabPanel("About this app", HTML(about))
       #tabPanel("About", includeHTML(knitr::knit2html("about.Rmd", force_v1 = T, fragment.only = T)))
     )
   )
