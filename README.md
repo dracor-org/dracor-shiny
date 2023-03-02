@@ -8,7 +8,7 @@ DraCor is a realisation of [Programmable Corpora](https://dracor.org/doc/what-is
 
 This app allows you to interact with the DraCor interactivelly by selecting a play and exploring the respective co-ocurence network, edges and characters data.
 
-You can access the app at https://shiny.dracor.org or locally if you have installed R and RStudio
+You can access the app at https://pozdniakov.shinyapps.io/Dracor/ or locally if you have installed R and RStudio
 
 ## How to run DraCor shiny locally
 
